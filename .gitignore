@@ -1,0 +1,14 @@
+# 의존성 · 빌드 산출물
+node_modules/
+dist/
+.vite/
+
+# 작업 흔적 (배포와 무관)
+_backup_search/
+.claude/
+_tab-preview.html
+
+# 기타
+*.log
+.DS_Store
+Thumbs.db

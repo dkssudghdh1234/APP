@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>사도행전의 전도 여정 | 인터랙티브 지도</title>
+  <meta name="description" content="사도행전 8장의 빌립의 전도와 13–28장의 바울의 네 차례 여정을 실제 지도 위에서 공부하는 인터랙티브 웹앱" />
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- 폰트 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@500;700;900&display=swap" rel="stylesheet" />
+  <!-- Pretendard (제목용) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
+  <link rel="stylesheet" href="css/styles.css?v=32" />
+</head>
+<body>
+  <!-- 인트로(랜딩) 오버레이 — 클릭/Enter/Space로 지도 화면 진입 -->
+  <div class="intro" id="intro" role="button" tabindex="0"
+       aria-label="클릭하여 사도행전의 전도 여정 지도 시작">
+    <div class="intro-inner">
+      <div class="intro-mark">
+        <svg class="intro-star" viewBox="0 0 100 100" aria-hidden="true">
+          <polygon points="50,4 54.64,35.73 77.04,12.79 62.14,41.18 93.75,35.79 65,50 93.75,64.21 62.14,58.82 77.04,87.21 54.64,64.27 50,96 45.36,64.27 22.96,87.21 37.86,58.82 6.25,64.21 35,50 6.25,35.79 37.86,41.18 22.96,12.79 45.36,35.73"/>
+        </svg>
+        <p class="intro-calling">CALLING</p>
+      </div>
+      <h1 class="intro-title">사도행전의<br/>전도 여정</h1>
+      <p class="intro-subtitle">THE MISSIONARY JOURNEYS OF ACTS</p>
+      <span class="intro-hint">클릭하여 시작 · 지도 보기</span>
+    </div>
+  </div>
+
+  <!-- 상단 헤더 -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-text">
+        <h1>사도행전의 전도 여정</h1>
+        <p>THE MISSIONARY JOURNEYS OF ACTS</p>
+      </div>
+    </div>
+    <div class="header-tools">
+      <button class="ghost-btn" id="fsBtn" title="전체화면" aria-label="전체화면"><svg class="lbl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 3.5H4.5A1.5 1.5 0 0 0 3 5v3.5M16 3.5h3.5A1.5 1.5 0 0 1 21 5v3.5M8 20.5H4.5A1.5 1.5 0 0 1 3 19v-3.5M16 20.5h3.5A1.5 1.5 0 0 0 21 19v-3.5"/></svg></button>
+      <button class="ghost-btn" id="helpBtn" title="사용법">?</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- 좌측 사이드바 -->
+    <aside class="sidebar" id="sidebar">
+      <div class="search-wrap">
+        <div class="search-box">
+          <svg class="search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+          <input type="search" id="searchInput" class="search-input"
+                 placeholder="말씀·지명·인물 검색" autocomplete="off" spellcheck="false"
+                 aria-label="사도행전 말씀·지명·인물 검색" />
+          <button class="search-clear" id="searchClear" type="button" aria-label="검색어 지우기" hidden>×</button>
+        </div>
+        <p class="search-hint">예) <b>행 16:9</b> · <b>13장</b> · <b>마게도냐</b> · <b>루스드라</b></p>
+      </div>
+
+      <div class="journey-tabs" id="journeyTabs">
+        <!-- JS로 생성 -->
+      </div>
+
+      <div class="sidebar-body" id="sidebarBody">
+        <!-- 검색 결과 (검색 중에는 여정 개요 대신 이 영역이 보인다) -->
+        <section class="search-results" id="searchResults" hidden></section>
+
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 4.5 3.5 6.5v13l5.5-2 6 2 5.5-2v-13l-5.5 2-6-2Z"/><path d="M9 4.5v15M15 6.5v15"/></svg></div>
+          <p>위에서 여정을 선택하면<br/>실제 지도 위에 경로가 그려집니다.</p>
+        </div>
+
+        <!-- 여행 개요 -->
+        <section class="journey-overview" id="journeyOverview" hidden>
+          <div class="overview-head">
+            <span class="overview-badge" id="ovBadge">1차</span>
+            <h2 id="ovTitle">제1차 전도여행</h2>
+          </div>
+          <div class="overview-meta">
+            <div class="meta-row"><span class="meta-label">연대</span><span id="ovPeriod">—</span></div>
+            <div class="meta-row"><span class="meta-label">본문</span><span id="ovScripture">—</span></div>
+            <div class="meta-row"><span class="meta-label">동행</span><span id="ovCompanions">—</span></div>
+          </div>
+          <p class="overview-summary" id="ovSummary">—</p>
+          <div class="stop-list-head">경로 <span id="ovStopCount"></span></div>
+          <ol class="stop-list" id="stopList"></ol>
+        </section>
+      </div>
+    </aside>
+
+    <!-- 지도 -->
+    <main class="map-wrap">
+      <div id="map"></div>
+      <div class="map-base-toggle" id="baseToggle" role="group" aria-label="지도 종류 전환">
+        <button class="base-opt is-on" data-base="modern" type="button">현대 지도</button>
+        <button class="base-opt" data-base="roman" type="button">로마 시대</button>
+      </div>
+      <div class="map-overlay-credit">지도 데이터 © Esri · HERE · Garmin · OpenStreetMap</div>
+    </main>
+  </div>
+
+  <!-- 지역 상세 패널 -->
+  <div class="detail-panel" id="detailPanel" aria-hidden="true">
+    <button class="detail-close" id="detailClose" aria-label="닫기">×</button>
+    <div class="detail-scroll" tabindex="-1">
+      <div class="detail-tag" id="dTag"></div>
+      <h2 class="detail-title" id="dTitle">—</h2>
+      <p class="detail-subtitle" id="dSubtitle">—</p>
+      <div id="detailBody"></div>
+    </div>
+  </div>
+
+  <!-- 사용법 모달 -->
+  <div class="modal-backdrop" id="helpModal" hidden>
+    <div class="modal">
+      <button class="detail-close" id="helpClose" aria-label="닫기">×</button>
+      <h2>사용 방법</h2>
+      <ul class="help-list">
+        <li><b>여정 선택</b> — 왼쪽 위 <b>빌립·1차·2차·3차·로마</b> 버튼을 누르면 해당 여정 경로가 실제 지도 위에 그려집니다.</li>
+        <li><b>전체 보기</b> — <b>전체</b> 버튼으로 다섯 여정을 한눈에 비교할 수 있습니다.</li>
+        <li><b>지역 클릭</b> — 지도의 번호 마커나 왼쪽 경로 목록을 누르면, 그곳에서 있었던 일·성경 본문·동행자가 표시됩니다.</li>
+        <li><b>동행자·서신</b> — 상세 패널의 동행자 이름이나 서신 칩을 누르면 인물 약전·서신 요약이 펼쳐집니다. 서신 칩의 <b>수신</b>은 그 도시로 보낸 편지, <b>기록</b>은 그 도시에서 쓴 편지라는 뜻입니다.</li>
+        <li><b>전진·귀환 경로</b> — 1차 전도여행에서는 경로 목록 위의 <b>전진/귀환</b> 버튼으로 나아간 길(실선)과 되짚어 온 길(점선)을 각각 강조해 볼 수 있습니다.</li>
+        <li><b>말씀 검색</b> — 왼쪽 위 검색창에 <b>행 16:9</b>·<b>13장</b>처럼 구절을 치면 그 본문(개역개정)과 그 말씀이 일어난 지도 위 지점이 함께 나오고, <b>마게도냐</b>처럼 말씀 속 낱말이나 지명·인물 이름으로도 찾을 수 있습니다. 결과를 누르면 그 자리로 지도가 옮겨 갑니다. (단축키 <b>/</b>)</li>
+        <li><b>본문 펼쳐 보기</b> — 상세 패널의 <b>성경 본문</b> 표시(행 13:1-3 등)를 누르면 그 구절의 개역개정 본문이 그 자리에서 펼쳐집니다.</li>
+        <li><b>지도 조작</b> — 마우스 휠/드래그로 확대·이동, 상단 토글로 현대 ⇄ 로마 시대 지도를 바꿀 수 있습니다.</li>
+      </ul>
+      <p class="help-note">지명은 개역개정 성경 표기를 따르며, 좌표는 고대 도시 유적지를 기준으로 합니다.</p>
+    </div>
+  </div>
+
+  <script src="js/data.js?v=32"></script>
+  <script src="js/people.js?v=32"></script>
+  <script src="js/epistles.js?v=32"></script>
+  <script src="js/acts-text.js?v=32"></script>
+  <script src="js/app.js?v=32"></script>
+  <script src="js/search.js?v=32"></script>
+</body>
+</html>
