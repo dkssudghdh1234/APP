@@ -1285,7 +1285,14 @@
 
   function showView(view) {
     if (!isNarrow()) { document.body.classList.remove("view-map"); return; }
-    document.body.classList.toggle("view-map", view === "map");
+    const toMap = view === "map";
+    // 목록으로 돌아가는 것은 그 지점 보기를 마친다는 뜻이므로,
+    // 열려 있던 설명 패널과 지도 말풍선도 함께 걷는다.
+    if (!toMap) {
+      closeDetail();
+      try { map.closePopup(); } catch (e) { /* noop */ }
+    }
+    document.body.classList.toggle("view-map", toMap);
     // 화면이 밀려 들어온 뒤 지도 크기를 다시 잡는다
     setTimeout(function () { map.invalidateSize(false); }, 360);
   }
