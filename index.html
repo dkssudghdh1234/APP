@@ -19,7 +19,7 @@
   <!-- Pretendard (제목용) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
 
-  <link rel="stylesheet" href="css/styles.css?v=32" />
+  <link rel="stylesheet" href="css/styles.css?v=36" />
 </head>
 <body>
   <!-- 인트로(랜딩) 오버레이 — 클릭/Enter/Space로 지도 화면 진입 -->
@@ -95,6 +95,9 @@
           <ol class="stop-list" id="stopList"></ol>
         </section>
       </div>
+
+      <!-- 좁은 화면 전용: 목록 화면 → 지도 화면 -->
+      <button class="to-map" id="toMap" type="button">지도 보기</button>
     </aside>
 
     <!-- 지도 -->
@@ -104,6 +107,11 @@
         <button class="base-opt is-on" data-base="modern" type="button">현대 지도</button>
         <button class="base-opt" data-base="roman" type="button">로마 시대</button>
       </div>
+      <!-- 좁은 화면 전용: 지도 화면 → 목록 화면 -->
+      <button class="to-list" id="toList" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 5 8 12l7 7"/></svg>
+        경로
+      </button>
       <div class="map-overlay-credit">지도 데이터 © Esri · HERE · Garmin · OpenStreetMap</div>
     </main>
   </div>
@@ -132,17 +140,18 @@
         <li><b>전진·귀환 경로</b> — 1차 전도여행에서는 경로 목록 위의 <b>전진/귀환</b> 버튼으로 나아간 길(실선)과 되짚어 온 길(점선)을 각각 강조해 볼 수 있습니다.</li>
         <li><b>말씀 검색</b> — 왼쪽 위 검색창에 <b>행 16:9</b>·<b>13장</b>처럼 구절을 치면 그 본문(개역개정)과 그 말씀이 일어난 지도 위 지점이 함께 나오고, <b>마게도냐</b>처럼 말씀 속 낱말이나 지명·인물 이름으로도 찾을 수 있습니다. 결과를 누르면 그 자리로 지도가 옮겨 갑니다. (단축키 <b>/</b>)</li>
         <li><b>본문 펼쳐 보기</b> — 상세 패널의 <b>성경 본문</b> 표시(행 13:1-3 등)를 누르면 그 구절의 개역개정 본문이 그 자리에서 펼쳐집니다.</li>
+        <li><b>좁은 화면(태블릿 · 휴대폰)</b> — 화면이 좁으면 <b>경로 목록</b>과 <b>지도</b>가 각각 전체 화면으로 나뉩니다. 목록에서 지역을 누르면 지도 화면으로 넘어가고, 왼쪽 위 <b>경로</b> 버튼으로 목록으로 돌아옵니다.</li>
         <li><b>지도 조작</b> — 마우스 휠/드래그로 확대·이동, 상단 토글로 현대 ⇄ 로마 시대 지도를 바꿀 수 있습니다.</li>
       </ul>
       <p class="help-note">지명은 개역개정 성경 표기를 따르며, 좌표는 고대 도시 유적지를 기준으로 합니다.</p>
     </div>
   </div>
 
-  <script src="js/data.js?v=32"></script>
-  <script src="js/people.js?v=32"></script>
-  <script src="js/epistles.js?v=32"></script>
-  <script src="js/acts-text.js?v=32"></script>
-  <script src="js/app.js?v=32"></script>
-  <script src="js/search.js?v=32"></script>
+  <script src="js/data.js?v=36"></script>
+  <script src="js/people.js?v=36"></script>
+  <script src="js/epistles.js?v=36"></script>
+  <script src="js/acts-text.js?v=36"></script>
+  <script src="js/app.js?v=36"></script>
+  <script src="js/search.js?v=36"></script>
 </body>
 </html>

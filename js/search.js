@@ -517,8 +517,8 @@
       // 여정을 갈아 끼우는 경우 패널이 조금 뒤에 그려지므로 콜백에서 펼친다
       after: ref ? function () { openBibleIn(ref, vno); } : null,
     });
-    // 좁은 화면에서는 결과 목록이 지도를 가리지 않도록 접어 둔다(검색어는 유지)
-    if (window.innerWidth <= 960 && sidebarBody) sidebarBody.classList.remove("searching");
+    // 좁은 화면에서는 app.js가 지도 화면으로 넘겨 준다.
+    // 목록으로 돌아왔을 때 검색 결과가 그대로 남아 있도록 여기서 접지 않는다.
   }
 
   /* 상세 패널에서 그 구절의 본문 카드를 펼치고, 찾던 절로 스크롤해 표시한다 */

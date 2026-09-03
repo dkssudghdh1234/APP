@@ -1049,6 +1049,8 @@
   }
 
   function openDetail(j, stops, selIndex, grp, opts) {
+    // 좀은 화면에서는 지점을 고르는 순간 지도 화면으로 넘어간다
+    if (isNarrow()) showView("map");
     resetLegEmphasis(); // 도시를 선택하면 전진/귀환 강조는 해제
     const color = COLORS[j.id];
     const primary = stops[0];
@@ -1262,7 +1264,8 @@
         setTimeout(() => { if (intro.parentNode) intro.parentNode.removeChild(intro); }, 750);
       }
       map.invalidateSize(false);
-      selectAll(false); // 진입 시 전체 보기를 먼저 표시(즉시 맞춤)
+      showView("list");  // 좁은 화면은 목록 화면부터 — 여정을 고르는 것이 첫 걸음
+      selectAll(false);  // 진입 시 전체 보기를 먼저 표시(즉시 맞춤)
     }
 
     if (!intro) { enterApp(); return; }
@@ -1273,6 +1276,32 @@
         enterApp();
       }
     });
+  }
+
+  /* ---------- 좁은 화면(≤960px): 목록 화면 ⇄ 지도 화면 ----------
+     넓은 화면에서는 둘이 나란히 보이므로 이 전환은 동작하지 않는다. */
+  const narrowMQ = window.matchMedia("(max-width: 960px)");
+  const isNarrow = () => narrowMQ.matches;
+
+  function showView(view) {
+    if (!isNarrow()) { document.body.classList.remove("view-map"); return; }
+    document.body.classList.toggle("view-map", view === "map");
+    // 화면이 밀려 들어온 뒤 지도 크기를 다시 잡는다
+    setTimeout(function () { map.invalidateSize(false); }, 360);
+  }
+
+  function setupViewSwitch() {
+    const toMap = $("toMap");
+    const toList = $("toList");
+    if (toMap) toMap.onclick = function () { showView("map"); };
+    if (toList) toList.onclick = function () { showView("list"); };
+    // 넓은 화면으로 바뀌면 전환 상태를 풀어 둔다
+    const onChange = function () {
+      if (!isNarrow()) document.body.classList.remove("view-map");
+      setTimeout(function () { map.invalidateSize(false); }, 60);
+    };
+    if (narrowMQ.addEventListener) narrowMQ.addEventListener("change", onChange);
+    else if (narrowMQ.addListener) narrowMQ.addListener(onChange);
   }
 
   /* ---------- 검색 모듈 연동 API ----------
@@ -1397,6 +1426,7 @@
     }
     buildTabs();
     setupBaseToggle();
+    setupViewSwitch();
     setupIntro();
   }
 

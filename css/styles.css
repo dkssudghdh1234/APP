@@ -1781,11 +1781,117 @@ body {
   .sr-item, .sr-verse { padding: 9px 11px 10px; }
 }
 
-/* ===== 태블릿 구간(768~960px, 세로로 넉넉한 화면) — 여정 탭을 한 줄로 =====
-   폭이 넉넉하므로 6개 탭을 3열 2행 대신 한 줄에 펴서, 그만큼(약 59px)
-   아래 경로 목록이 더 보이게 한다. 사이드바 높이·지도 크기는 그대로다.
-   높이 조건(min-height: 561px)은 가로 모바일을 제외하기 위한 것 —
-   그 구간은 좌우 배치라 사이드바가 좁아 3열이 맞다. */
-@media (min-width: 768px) and (max-width: 960px) and (min-height: 561px) {
+/* ============================================================
+   좁은 화면(≤960px) — 목록 화면 ⇄ 지도 화면으로 나눈다
+
+   위아래로 쪼개 놓으면 스크롤(목록)과 드래그(지도)가 맞닿아
+   어디가 반응할지 예측되지 않는다. 두 화면을 겹쳐 두고 밀어서
+   전환하면 각 화면이 온전히 넓어지고 조작도 부딪히지 않는다.
+   PC(961px 이상)는 지금까지대로 좌우로 함께 본다.
+   ============================================================ */
+/* 화면 전환 버튼은 좁은 화면에서만 나타난다 (기본은 숨김) */
+.to-map,
+.to-list { display: none; }
+
+@media (max-width: 960px) {
+  .layout { position: relative; overflow: hidden; }
+
+  /* 두 화면 모두 레이아웃 전체를 차지하고 겹쳐 놓는다 */
+  .sidebar,
+  .map-wrap {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%; height: 100%;
+    max-width: none; max-height: none; min-width: 0;
+  }
+  .sidebar {
+    z-index: 500;
+    border: none;
+    box-shadow: none;
+    transition: transform 0.34s var(--ease-emphasized);
+  }
+  body.view-map .sidebar { transform: translateX(-100%); }
+  .map-wrap { z-index: 400; }
+
+  /* 목록 화면 → 지도 화면 */
+  .to-map {
+    position: absolute;
+    z-index: 560;
+    bottom: 18px; left: 50%;
+    transform: translateX(-50%);
+    display: inline-flex; align-items: center; gap: 7px;
+    border: none; cursor: pointer;
+    font-family: inherit; font-size: 13px; font-weight: 700;
+    letter-spacing: -0.2px; white-space: nowrap; color: #fff;
+    background: linear-gradient(145deg, #868df0, var(--accent));
+    padding: 12px 24px;
+    border-radius: var(--r-pill);
+    box-shadow: 0 10px 24px rgba(123, 131, 235, 0.45);
+    transition: transform 0.2s var(--ease-spring-soft), box-shadow 0.2s var(--ease-standard);
+  }
+  .to-map:active { transform: translateX(-50%) scale(0.97); box-shadow: 0 5px 14px rgba(123, 131, 235, 0.4); }
+  body.view-map .to-map { display: none; }
+  /* '지도 보기' 버튼이 목록 끝 항목을 가리지 않도록 아래 여백 */
+  .sidebar-body { padding-bottom: 72px; }
+
+  /* 지도 화면 → 목록 화면 */
+  .to-list {
+    position: absolute;
+    z-index: 460;
+    top: 12px; left: 12px;
+    display: none; align-items: center; gap: 4px;
+    border: none; cursor: pointer;
+    font-family: inherit; font-size: 12.5px; font-weight: 700;
+    letter-spacing: -0.2px; color: var(--accent-deep);
+    background: var(--surface);
+    padding: 9px 16px 9px 12px;
+    border-radius: var(--r-pill);
+    box-shadow: var(--nm-raised-sm);
+    transition: transform 0.2s var(--ease-spring-soft), color 0.2s var(--ease-standard);
+  }
+  .to-list svg { width: 15px; height: 15px; }
+  .to-list:active { transform: scale(0.97); box-shadow: var(--nm-inset-sm); }
+  body.view-map .to-list { display: inline-flex; }
+
+  /* 지도 확대 버튼이 '경로' 버튼에 겹치지 않도록 아래로 */
+  .leaflet-top.leaflet-left { top: 56px; }
+
+  /* 설명 시트 — 지점의 위치와 설명을 함께 볼 수 있게 낮춘다 */
+  .detail-panel {
+    top: auto; bottom: 0; left: 0; right: auto;
+    width: 100%;
+    height: 55dvh;
+    max-height: calc(100dvh - var(--header-h) - 12px);
+    transform: translateY(106%);
+    border-left: none; border-top: none;
+    border-radius: 24px 24px 0 0;
+    box-shadow: 0 -12px 28px rgba(143, 154, 194, 0.45);
+  }
+  .detail-panel.open { transform: translateY(0); }
+
+  /* 목록이 화면 전체를 쓰므로 여정 탭은 한 줄로 편다 */
   .journey-tabs { grid-template-columns: repeat(6, 1fr); gap: 8px; }
+}
+
+/* 가로로 누운 낮은 화면(폰 가로) — 세로로 쌓으면 지도가 거의 남지 않는다.
+   설명을 오른쪽으로 보내 지도와 나란히 보게 한다. */
+@media (max-width: 960px) and (max-height: 560px) {
+  .detail-panel {
+    top: 0; bottom: 0; left: auto; right: 0;
+    width: min(58%, 380px);
+    height: 100%;
+    max-height: none;
+    transform: translateX(106%);
+    border-radius: 0;
+    box-shadow: -14px 0 30px rgba(143, 154, 194, 0.4);
+  }
+  .detail-panel.open { transform: translateX(0); }
+  .to-map { bottom: 12px; padding: 9px 20px; font-size: 12px; }
+  .to-list { top: 10px; left: 10px; padding: 7px 14px 7px 10px; }
+  .leaflet-top.leaflet-left { top: 50px; }
+}
+
+/* 아주 좁은 폰 — 탭 6열은 글자가 눌리므로 3열 2행 유지 */
+@media (max-width: 620px) {
+  .journey-tabs { grid-template-columns: repeat(3, 1fr); }
 }
